@@ -34,9 +34,26 @@ describe "UserPages" do
 				expect { click_button submit }.to change(User, :count).by(1)
 			end
 		end
+	end
 
-		it {should have_selector('h1', text: 'Sign up')}
-		it {should have_selector('title', text: 'Sign up')}
+	describe "signup error" do
+		before do
+			visit signup_path
+
+			fill_in "Name", with: ""
+			fill_in "Email", with: "user@"
+			fill_in "Password", with: "foobar"
+			fill_in "Confirmation", with: "barfood" 
+
+			click_button "Create my account"
+		end
+
+		describe "after submission" do
+			it {should have_content("The form contains 3 errors")}
+			it {should have_content("Password doesn't match confirmation")}
+			it {should have_content("Name can't be blank")}
+			it {should have_content("Email is invalid")}
+		end
 	end
 
 	describe "profile page" do
