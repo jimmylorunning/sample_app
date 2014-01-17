@@ -4,24 +4,14 @@
 <div class="row">
 	<div class="span6 offset3">
 	<%= form_for(@user) do |f| %>
-			<% concat render 'shared/error_messages' 
 
-			concat f.label :name 
-			concat f.text_field :name
+			<%= render 'fields', f: f %>
 
-			concat f.label :email
-			concat f.text_field :email
+			<%= f.submit "Save changes", class: "btn btn-large btn-primary" %>			
 
-			concat f.label :password
-			concat f.password_field :password
+	<% end %>
 
-			concat f.label :password_confirmation, "Confirm Password"
-			concat f.password_field :password_confirmation
-
-			concat f.submit "Save changes", class: "btn btn-large btn-primary"
-		end 
-
-		concat gravatar_for @user %>
-		<a href="http://gravatar.com/emails">change</a>
+		<%= gravatar_for @user %>
+		<a href="http://gravatar.com/emails" target="_blank">change</a>
 	</div>
 </div>

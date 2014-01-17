@@ -19,6 +19,9 @@ describe "Authentication" do
 
 			it { should have_selector('title', text: 'Sign in') }
 			it { should have_selector('div.alert.alert-error', text: 'Invalid') }
+			it { should_not have_link('Profile') }
+			it { should_not have_link('Settings') }
+			it { should_not have_link('Sign out') }			
 
 			describe "after visiting another page" do
 				before { click_link "Home" }
@@ -72,9 +75,22 @@ describe "Authentication" do
 					click_button "Sign in"
 				end
 
+				# friendly forwarding...
+
 				describe "after signing in" do
 					it "should render the desired protected page" do
 						page.should have_selector('title', text: 'Edit user')
+					end
+				end
+
+				describe "subsequent sign in attempts" do
+					before do
+						click_link "Sign out"
+						sign_in user
+					end
+
+					it "should not still render the previous desired protected page" do
+						page.should_not have_selector('title', text: 'Edit user')
 					end
 				end
 
@@ -99,7 +115,7 @@ describe "Authentication" do
 		end
 
 		describe "as non-admin user" do
-			let (:user) { FactoryGirl.create(:user) }
+			let(:user) { FactoryGirl.create(:user) }
 			let(:non_admin) { FactoryGirl.create(:user) }
 
 			before { sign_in non_admin }
@@ -112,6 +128,19 @@ describe "Authentication" do
 
 		describe "as admin user" do
 			# write test here to make sure admin user does not delete him/herself
+			let(:admin) { FactoryGirl.create(:admin) }
+
+			before { sign_in admin }
+
+			describe "submitting a DELETE request for him/herself" do
+				before { delete user_path(admin) }
+				specify { response.should redirect_to(root_path) }
+# 				why this no work? -- it's not failing!
+#				it { should_not have_selector('div.alert.alert-success') }				
+# 				why this no work? 
+#				expect { delete user_path(admin) }.not_to change(User, :count).by(-1)
+			end
 		end
+
 	end
 end

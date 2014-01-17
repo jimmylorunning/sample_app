@@ -42,7 +42,7 @@ describe "UserPages" do
 				end
 
 				it { should have_link('delete', href: user_path(User.first)) }
-				it "should be able to delte another user" do
+				it "should be able to delete another user" do
 					expect { click_link('delete') }.to change(User, :count).by(-1)
 				end
 				it { should_not have_link('delete', href: user_path(admin)) }
@@ -51,10 +51,27 @@ describe "UserPages" do
 	end
 
 	describe "signup page" do
-		before {visit signup_path}
 
-		it {should have_selector('h1', text: 'Sign up')}
-		it {should have_selector('title', text: 'Sign up')}
+		describe "if not signed in" do
+			before {visit signup_path}
+
+			it {should have_selector('h1', text: 'Sign up')}
+			it {should have_selector('title', text: 'Sign up')}
+		end
+
+		describe "if already signed in" do
+
+			let(:user) { FactoryGirl.create(:user) }
+			
+			before do
+				sign_in user
+				visit signup_path
+			end
+
+			it { should_not have_selector('h1', text: 'Sign up') }
+			it { should_not have_selector('title', text: 'Sign up')}
+		end
+
 	end
 
 	describe "signup" do
@@ -73,7 +90,7 @@ describe "UserPages" do
 				fill_in "Name", with: "Example User"
 				fill_in "Email", with: "user@example.com"
 				fill_in "Password", with: "foobar"
-				fill_in "Confirmation", with: "foobar"
+				fill_in "Confirm Password", with: "foobar"
 			end
 
 			it "should create a user" do
@@ -103,7 +120,7 @@ describe "UserPages" do
 			fill_in "Name", with: ""
 			fill_in "Email", with: "user@"
 			fill_in "Password", with: "foobar"
-			fill_in "Confirmation", with: "barfood" 
+			fill_in "Confirm Password", with: "barfood" 
 
 			click_button "Create my account"
 		end
