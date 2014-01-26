@@ -10,7 +10,7 @@
 #
 
 class User < ActiveRecord::Base
-  attr_accessible :email, :name, :password, :password_confirmation, :admin
+  attr_accessible :email, :name, :password, :password_confirmation
   has_secure_password
   has_many :microposts, dependent: :destroy
 
@@ -23,6 +23,11 @@ class User < ActiveRecord::Base
   	uniqueness: { case_sensitive: false }
   validates :password, presence: true, length: { minimum: 6 }
   validates :password_confirmation, presence: true
+
+  def feed
+    # preliminary
+    Micropost.where("user_id = ?", id)
+  end
 
   private
   def create_remember_token

@@ -96,6 +96,23 @@ describe "Authentication" do
 
 			end
 
+			describe "in the Microposts controller" do
+
+				describe "submitting to the create action" do
+					before { post microposts_path }
+					specify { response.should redirect_to(signin_path) }
+				end
+
+				describe "submitting to the destroy action" do
+					let!(:micropost) { FactoryGirl.create(:micropost) }
+					before do 
+						delete micropost_path(micropost) 
+					end
+					specify { response.should redirect_to(signin_path) }
+				end
+
+			end
+
 		end
 
 		describe "as wrong user" do
@@ -110,7 +127,9 @@ describe "Authentication" do
 
 			describe "submitting a PUT request to the Users#update action" do
 				before { put user_path(wrong_user) }
-				specify { response.should redirect_to(root_path) }
+#				specify { response.should redirect_to(root_path) }
+# should is being deprecated, trying out expect instead...
+				it { expect{response}.to redirect_to(root_path) }
 			end
 		end
 
@@ -133,12 +152,14 @@ describe "Authentication" do
 			before { sign_in admin }
 
 			describe "submitting a DELETE request for him/herself" do
-				before { delete user_path(admin) }
-				specify { response.should redirect_to(root_path) }
+#				before { delete user_path(admin) }
+#				specify { response.should redirect_to(root_path) }
 # 				why this no work? -- it's not failing!
 #				it { should_not have_selector('div.alert.alert-success') }				
 # 				why this no work? 
-#				expect { delete user_path(admin) }.not_to change(User, :count).by(-1)
+				it "doesn't delete user" do
+					expect { delete user_path(admin) }.not_to change(User, :count).by(-1)
+				end
 			end
 		end
 

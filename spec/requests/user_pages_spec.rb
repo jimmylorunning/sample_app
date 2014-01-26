@@ -133,7 +133,7 @@ describe "UserPages" do
 		end
 	end
 
-	describe "profile page" do
+	describe "on the users profile page" do
 		let(:user) { FactoryGirl.create(:user) }
 		let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
 		let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
@@ -149,6 +149,24 @@ describe "UserPages" do
 			it { should have_content(user.microposts.count) }
 		end
 	end
+
+# ok i changed this a little from the book... not really understanding things here
+# wrt microposts showing up on root path, why not test here? also: how to do it? 
+# my rspec code doesn't work
+# OK I figured out why... because in this test the user isn't signed in yet!
+# Besides implementation should be on static_pages_spec.rb, under "Home page for signed in users"
+
+#		describe "on the root page" do
+#			before { visit root_path }
+
+#			it { should have_selector('h1', text: user.name) }
+
+#			describe "microposts" do
+#				it { should have_content(m1.content) }
+#				it { should have_content(m2.content) }
+#				it { should have_content(user.microposts.count) }
+#			end			
+#		end		
 
 	describe "edit" do
 		let(:user) { FactoryGirl.create(:user) }
@@ -192,13 +210,19 @@ describe "UserPages" do
 				{ user: {admin: true, password: user.password, 
 					password_confirmation: user.password } }
 			end
+
 			before do
-				sign_in user, no_capybara: true
-#				patch user_path(user), params
-# exercise 9.6.1
-# can't get this 'patch' statement to work so just commenting it out for now
+				sign_in user, no_capybara: true				
 			end
-#			specify { expect(user.reload).not_to be_admin }
+
+			it "should not allow user to assign parameters" do
+				expect do 
+					put user_path(user), params
+				end.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+			end
+
+
+			specify { expect(user.reload).not_to be_admin }
 		end
 
 	end
